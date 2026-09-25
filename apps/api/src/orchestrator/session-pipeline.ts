@@ -128,6 +128,7 @@ export class SessionPipeline {
         );
         await this.deps.transcripts.append(translated);
         await this.publish([new SegmentTranslated(translated, this.deps.clock.now())]);
+        this.recordLatency(translated);
       }),
     );
     results.forEach((result, i) => {
@@ -139,10 +140,15 @@ export class SessionPipeline {
     });
   }
 
+  /**
+   * Audio end -> caption published. Live transcribers stamp `endMs` with the audio pushed so far,
+   * so originals land near 0 and may jitter slightly negative (clamped); translations add the
+   * translation round-trip, which is the delay the translated audience actually sees.
+   */
   private recordLatency(segment: TranscriptSegment): void {
     if (this.epochMs === null) return;
     const audioEndAt = this.epochMs + segment.range.endMs;
-    this.session.metrics.recordLatency(this.deps.clock.now().getTime() - audioEndAt);
+    this.session.metrics.recordLatency(Math.max(0, this.deps.clock.now().getTime() - audioEndAt));
   }
 
   private async publish(events: DomainEvent[]): Promise<void> {

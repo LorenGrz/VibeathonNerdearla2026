@@ -354,7 +354,7 @@ TRANSCRIBER=mock|live|chunked      # Which transcriber adapter to use
 TRANSLATOR=mock|gemini             # Which translator adapter to use
 GEMINI_API_KEY=sk-...              # Required for live/gemini modes
 GEMINI_LIVE_MODEL=gemini-3.5-transcribe-live
-GEMINI_TEXT_MODEL=gemini-2.5-flash
+GEMINI_TEXT_MODEL=gemini-3.5-flash-lite
 MAX_SESSIONS=12                    # Concurrency limit
 SAMPLES_DIR=../../samples           # Where to find audio fixtures
 ```

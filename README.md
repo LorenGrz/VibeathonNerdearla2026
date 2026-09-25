@@ -140,7 +140,7 @@ Then repeat the quickstart steps, but:
 **Model details:**
 
 - `GEMINI_LIVE_MODEL=gemini-3.5-transcribe-live` (streaming speech-to-text, verified 2026-09-25)
-- `GEMINI_TEXT_MODEL=gemini-2.5-flash` (translations + chunked fallback)
+- `GEMINI_TEXT_MODEL=gemini-3.5-flash-lite` (translations + chunked fallback)
 
 #### Environment Variables
 
@@ -153,7 +153,7 @@ TRANSCRIBER=mock           # live | chunked | mock
 TRANSLATOR=mock            # gemini | mock
 GEMINI_API_KEY=            # Required for live/gemini modes
 GEMINI_LIVE_MODEL=gemini-3.5-transcribe-live
-GEMINI_TEXT_MODEL=gemini-2.5-flash
+GEMINI_TEXT_MODEL=gemini-3.5-flash-lite
 MAX_SESSIONS=12            # Concurrent sessions per process
 SAMPLES_DIR=../../samples  # Relative to api distrib, or absolute path
 ```

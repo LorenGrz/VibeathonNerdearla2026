@@ -7,7 +7,7 @@ export const envSchema = z.object({
   TRANSLATOR: z.enum(['gemini', 'mock']).default('mock'),
   GEMINI_API_KEY: z.string().optional(),
   GEMINI_LIVE_MODEL: z.string().default('gemini-3.5-transcribe-live'),
-  GEMINI_TEXT_MODEL: z.string().default('gemini-2.5-flash'),
+  GEMINI_TEXT_MODEL: z.string().default('gemini-3.5-flash-lite'),
   MAX_SESSIONS: z.coerce.number().int().positive().default(12),
   SAMPLES_DIR: z.string().default('../../samples'),
 });

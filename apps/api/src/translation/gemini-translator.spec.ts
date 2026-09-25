@@ -129,17 +129,18 @@ describe('GeminiTranslator', () => {
     expect(client.calls[1]?.prompt).not.toContain('From session one.');
   });
 
-  it('retries once after a failure and throws once both attempts fail', async () => {
+  it('retries twice after failures and throws once all three attempts fail', async () => {
     const client = new FakeGeminiTextClient([
       () => Promise.reject(new Error('timeout')),
-      () => Promise.reject(new Error('timeout again')),
+      () => Promise.reject(new Error('503 high demand')),
+      () => Promise.reject(new Error('504 deadline expired')),
     ]);
     const translator = new GeminiTranslator(client, 'gemini-2.5-flash');
 
     await expect(
       translator.translate(originalSegment(), LanguageCode.of('es'), Glossary.empty()),
-    ).rejects.toThrow(/Gemini translation failed after 2 attempts/);
-    expect(client.calls).toHaveLength(2);
+    ).rejects.toThrow(/Gemini translation failed after 3 attempts: 504 deadline expired/);
+    expect(client.calls).toHaveLength(3);
   });
 
   it('succeeds on the retry after a single failure', async () => {

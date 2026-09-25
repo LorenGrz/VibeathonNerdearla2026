@@ -8,9 +8,11 @@ const SYSTEM_INSTRUCTION =
   'no explanations, and no extra commentary.';
 
 const TEMPERATURE = 0.2;
-const TIMEOUT_MS = 5000;
-/** Initial attempt + 1 retry. */
-const MAX_ATTEMPTS = 2;
+/** Flash-lite answers in ~1 s, but demand spikes (503/504) can take several seconds. */
+const TIMEOUT_MS = 8000;
+/** Initial attempt + 2 retries. */
+const MAX_ATTEMPTS = 3;
+const RETRY_DELAY_MS = 500;
 /** Number of previous original sentences kept as context, per session. */
 const CONTEXT_SIZE = 2;
 
@@ -92,6 +94,7 @@ export class GeminiTranslator implements TranslatorPort {
         return await this.callWithTimeout(request);
       } catch (error) {
         lastError = error;
+        if (attempt < MAX_ATTEMPTS) await delay(RETRY_DELAY_MS * attempt);
       }
     }
     const reason = lastError instanceof Error ? lastError.message : String(lastError);
@@ -117,3 +120,5 @@ export class GeminiTranslator implements TranslatorPort {
     });
   }
 }
+
+const delay = (ms: number): Promise<void> => new Promise((done) => setTimeout(done, ms));
