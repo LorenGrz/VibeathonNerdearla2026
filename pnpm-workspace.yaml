@@ -1,0 +1,10 @@
+packages:
+  - 'apps/*'
+  - 'packages/*'
+
+allowBuilds:
+  '@google/genai': false
+  '@nestjs/core': false
+  protobufjs: false
+  sharp: false
+  unrs-resolver: false

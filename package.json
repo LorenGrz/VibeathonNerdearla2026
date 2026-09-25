@@ -1,0 +1,24 @@
+{
+  "name": "livesubs",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Open source live captions and translation for multi-track conferences.",
+  "license": "MIT",
+  "packageManager": "pnpm@12.5.1",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build:domain": "pnpm --filter @subs/domain build",
+    "dev": "pnpm build:domain && pnpm -r --parallel dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm build:domain && pnpm -r typecheck",
+    "test": "pnpm build:domain && pnpm -r test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "prettier": "^3.4.2"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "lib": ["ES2023"],
+    "types": [],
+    "rootDir": "src",
+    "outDir": "dist",
+    "verbatimModuleSyntax": true,
+    "exactOptionalPropertyTypes": true
+  },
+  "include": ["src"]
+}
