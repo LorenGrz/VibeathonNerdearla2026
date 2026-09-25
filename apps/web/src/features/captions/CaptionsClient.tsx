@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import type { LanguageCodeValue } from '@subs/domain';
+import type { LanguageCodeValue, SessionStatus } from '@subs/domain';
 import { CaptionControls } from './CaptionControls';
 import { CaptionFeed } from './CaptionFeed';
 import { ConnectionBadge } from './ConnectionBadge';
@@ -22,12 +22,22 @@ export interface CaptionsClientProps {
   sessionId: string;
   languages: LanguageCodeValue[];
   initialLanguage: LanguageCodeValue;
+  initialStatus?: SessionStatus;
 }
 
-export function CaptionsClient({ sessionId, languages, initialLanguage }: CaptionsClientProps) {
+export function CaptionsClient({
+  sessionId,
+  languages,
+  initialLanguage,
+  initialStatus,
+}: CaptionsClientProps) {
   const router = useRouter();
   const [language, setLanguage] = useState<LanguageCodeValue>(initialLanguage);
-  const { finals, partial, connectionStatus, sessionStatus } = useCaptions(sessionId, language);
+  const { finals, partial, connectionStatus, sessionStatus } = useCaptions(
+    sessionId,
+    language,
+    initialStatus ?? null,
+  );
   const { preferences, increaseFontSize, decreaseFontSize, toggleHighContrast } =
     useCaptionPreferences();
 
@@ -53,6 +63,7 @@ export function CaptionsClient({ sessionId, languages, initialLanguage }: Captio
         partial={partial}
         fontSizeClassName={FONT_SIZE_CLASSES[preferences.fontSize]}
         highContrast={preferences.highContrast}
+        sessionStatus={sessionStatus}
       />
     </section>
   );

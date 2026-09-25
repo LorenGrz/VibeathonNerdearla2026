@@ -58,6 +58,7 @@ export default async function SessionPage(props: PageProps<'/s/[id]'>) {
           sessionId={session.id}
           languages={languages}
           initialLanguage={initialLanguage}
+          initialStatus={session.status}
         />
       </main>
     </div>

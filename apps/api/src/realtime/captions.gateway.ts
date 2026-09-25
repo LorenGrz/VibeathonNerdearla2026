@@ -53,6 +53,7 @@ export class CaptionsGateway {
         .slice(-HISTORY_SIZE)
         .map((segment) => segment.toDto());
       client.emit('captions:history', history);
+      client.emit('session:status', { id: sessionId.value, status: session.status });
     } catch (error) {
       client.emit('captions:error', {
         message: error instanceof Error ? error.message : 'Invalid captions:join payload',

@@ -17,7 +17,7 @@ export type CaptionsSocket = Socket<
 
 export function connectCaptionsSocket(): CaptionsSocket {
   return io(`${getApiBaseUrl()}${WS_NAMESPACE_CAPTIONS}`, {
-    transports: ['websocket'],
+    transports: ['websocket', 'polling'],
     reconnection: true,
   });
 }

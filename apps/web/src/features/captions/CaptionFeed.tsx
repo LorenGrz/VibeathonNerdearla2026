@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import type { CaptionDto } from '@subs/domain';
+import type { CaptionDto, SessionStatus } from '@subs/domain';
 
 const AUTO_SCROLL_THRESHOLD_PX = 48;
 
@@ -10,6 +10,7 @@ export interface CaptionFeedProps {
   partial: CaptionDto | null;
   fontSizeClassName: string;
   highContrast: boolean;
+  sessionStatus?: SessionStatus | null;
 }
 
 export function CaptionFeed({
@@ -17,6 +18,7 @@ export function CaptionFeed({
   partial,
   fontSizeClassName,
   highContrast,
+  sessionStatus,
 }: CaptionFeedProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [autoScroll, setAutoScroll] = useState(true);
@@ -54,17 +56,45 @@ export function CaptionFeed({
       >
         {isEmpty ? (
           <div className="flex h-full flex-col items-center justify-center gap-3 p-8 text-center">
-            <div className="flex items-center gap-1.5 py-2" aria-hidden="true">
-              <span className="h-6 w-1.5 rounded-full bg-teal animate-pulse" />
-              <span className="h-10 w-1.5 rounded-full bg-accent animate-pulse [animation-delay:150ms]" />
-              <span className="h-4 w-1.5 rounded-full bg-brand animate-pulse [animation-delay:300ms]" />
-            </div>
-            <p className="font-display text-lg uppercase font-semibold text-text">
-              Esperando subtítulos…
-            </p>
-            <p className="text-xs text-text-muted max-w-sm">
-              El motor de Gemini está conectado y escuchando en tiempo real.
-            </p>
+            {sessionStatus === 'stopped' ? (
+              <>
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-surface border border-line text-text-muted text-xl">
+                  ⏹
+                </div>
+                <p className="font-display text-lg uppercase font-semibold text-text">
+                  Sesión finalizada
+                </p>
+                <p className="text-xs text-text-muted max-w-sm">
+                  Esta sesión ha terminado. Podés reiniciar la reproducción o abrir una nueva sala desde el panel de producción.
+                </p>
+              </>
+            ) : sessionStatus === 'idle' ? (
+              <>
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-surface border border-line text-accent text-xl">
+                  ⏳
+                </div>
+                <p className="font-display text-lg uppercase font-semibold text-text">
+                  Sesión en espera
+                </p>
+                <p className="text-xs text-text-muted max-w-sm">
+                  La sesión todavía no ha sido iniciada. Dale a «Iniciar» en el panel de producción para comenzar.
+                </p>
+              </>
+            ) : (
+              <>
+                <div className="flex items-center gap-1.5 py-2" aria-hidden="true">
+                  <span className="h-6 w-1.5 rounded-full bg-teal animate-pulse" />
+                  <span className="h-10 w-1.5 rounded-full bg-accent animate-pulse [animation-delay:150ms]" />
+                  <span className="h-4 w-1.5 rounded-full bg-brand animate-pulse [animation-delay:300ms]" />
+                </div>
+                <p className="font-display text-lg uppercase font-semibold text-text">
+                  {sessionStatus === 'starting' ? 'Iniciando conexión…' : 'Escuchando en vivo…'}
+                </p>
+                <p className="text-xs text-text-muted max-w-sm">
+                  El motor de Gemini está conectado y procesando el audio en tiempo real.
+                </p>
+              </>
+            )}
           </div>
         ) : (
           <ul className="space-y-3.5 p-2">

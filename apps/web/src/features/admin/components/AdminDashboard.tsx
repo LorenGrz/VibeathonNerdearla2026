@@ -15,7 +15,7 @@ function errorMessage(error: unknown, fallback: string): string {
 }
 
 export function AdminDashboard() {
-  const { sessions, connected } = useAdminSessions();
+  const { sessions, connected, setSessions } = useAdminSessions();
   const [samples, setSamples] = useState<string[]>([]);
   const [samplesError, setSamplesError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -38,36 +38,64 @@ export function AdminDashboard() {
     };
   }, []);
 
-  const handleCreate = useCallback(async (dto: CreateSessionDto) => {
-    setActionError(null);
-    try {
-      await createSession(dto);
-    } catch (error) {
-      setActionError(errorMessage(error, 'No se pudo crear la sesión.'));
-      throw error;
-    }
-  }, []);
+  const handleCreate = useCallback(
+    async (dto: CreateSessionDto) => {
+      setActionError(null);
+      try {
+        const created = await createSession(dto);
+        setSessions((prev) => [...prev, created]);
+      } catch (error) {
+        setActionError(errorMessage(error, 'No se pudo crear la sesión.'));
+        throw error;
+      }
+    },
+    [setSessions],
+  );
 
-  const handleStart = useCallback((id: string) => {
-    setActionError(null);
-    startSession(id).catch((error: unknown) => {
-      setActionError(errorMessage(error, 'No se pudo iniciar la sesión.'));
-    });
-  }, []);
+  const handleStart = useCallback(
+    (id: string) => {
+      setActionError(null);
+      setSessions((prev) =>
+        prev.map((s) => (s.id === id ? { ...s, status: 'starting' } : s)),
+      );
+      startSession(id)
+        .then((updated) => {
+          setSessions((prev) => prev.map((s) => (s.id === id ? updated : s)));
+        })
+        .catch((error: unknown) => {
+          setActionError(errorMessage(error, 'No se pudo iniciar la sesión.'));
+        });
+    },
+    [setSessions],
+  );
 
-  const handleStop = useCallback((id: string) => {
-    setActionError(null);
-    stopSession(id).catch((error: unknown) => {
-      setActionError(errorMessage(error, 'No se pudo detener la sesión.'));
-    });
-  }, []);
+  const handleStop = useCallback(
+    (id: string) => {
+      setActionError(null);
+      setSessions((prev) =>
+        prev.map((s) => (s.id === id ? { ...s, status: 'stopped' } : s)),
+      );
+      stopSession(id)
+        .then((updated) => {
+          setSessions((prev) => prev.map((s) => (s.id === id ? updated : s)));
+        })
+        .catch((error: unknown) => {
+          setActionError(errorMessage(error, 'No se pudo detener la sesión.'));
+        });
+    },
+    [setSessions],
+  );
 
-  const handleDelete = useCallback((id: string) => {
-    setActionError(null);
-    deleteSession(id).catch((error: unknown) => {
-      setActionError(errorMessage(error, 'No se pudo eliminar la sesión.'));
-    });
-  }, []);
+  const handleDelete = useCallback(
+    (id: string) => {
+      setActionError(null);
+      setSessions((prev) => prev.filter((s) => s.id !== id));
+      deleteSession(id).catch((error: unknown) => {
+        setActionError(errorMessage(error, 'No se pudo eliminar la sesión.'));
+      });
+    },
+    [setSessions],
+  );
 
   const handleDemo = useCallback(async () => {
     setActionError(null);
