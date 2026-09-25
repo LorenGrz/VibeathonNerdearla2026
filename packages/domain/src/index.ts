@@ -8,3 +8,4 @@ export * from './transcript/index.js';
 export * from './glossary/index.js';
 export * from './events/index.js';
 export * from './ports/index.js';
+export * from './export/index.js';
