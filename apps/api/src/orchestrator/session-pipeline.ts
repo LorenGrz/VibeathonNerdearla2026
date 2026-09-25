@@ -1,7 +1,6 @@
 import {
   SegmentTranscribed,
   SegmentTranslated,
-  type AudioSourcePort,
   type Clock,
   type DomainEvent,
   type EventPublisherPort,
@@ -12,10 +11,12 @@ import {
   type TranscriptSegment,
   type TranslatorPort,
 } from '@subs/domain';
+import type { ContextualAudioSource } from '../ingest/audio-source-context.js';
 import { errorMessage } from './async-utils.js';
 
 export interface PipelineDeps {
-  audio: AudioSourcePort;
+  /** Any domain `AudioSourcePort` fits; the session id is passed as context (needed by `mic`). */
+  audio: ContextualAudioSource;
   transcriber: TranscriberPort;
   translator: TranslatorPort;
   transcripts: TranscriptRepository;
@@ -67,7 +68,9 @@ export class SessionPipeline {
         attempt.abort(error); // unblocks the audio loop so the attempt can be retried
       });
 
-      for await (const chunk of this.deps.audio.open(this.session.source, attempt.signal)) {
+      for await (const chunk of this.deps.audio.open(this.session.source, attempt.signal, {
+        sessionId: this.session.id.value,
+      })) {
         if (attempt.signal.aborted) break;
         this.session.metrics.recordChunk(chunk.data.byteLength);
         opened.push(chunk);

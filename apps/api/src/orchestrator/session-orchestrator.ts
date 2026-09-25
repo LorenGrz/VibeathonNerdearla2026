@@ -10,7 +10,6 @@ import {
 import { ConfigService } from '@nestjs/config';
 import {
   InvalidSessionTransitionError,
-  type AudioSourcePort,
   type EventPublisherPort,
   type Session,
   type SessionId,
@@ -21,6 +20,7 @@ import {
   type TranslatorPort,
 } from '@subs/domain';
 import type { Env } from '../config/env.js';
+import type { ContextualAudioSource } from '../ingest/audio-source-context.js';
 import {
   AUDIO_SOURCE,
   EVENT_PUBLISHER,
@@ -61,7 +61,7 @@ export class SessionOrchestrator implements SessionRunner, OnModuleDestroy {
   constructor(
     @Inject(SESSION_REPOSITORY) private readonly sessions: SessionRepository,
     @Inject(TRANSCRIPT_REPOSITORY) private readonly transcripts: TranscriptRepository,
-    @Inject(AUDIO_SOURCE) private readonly audio: AudioSourcePort,
+    @Inject(AUDIO_SOURCE) private readonly audio: ContextualAudioSource,
     @Inject(TRANSCRIBER) private readonly transcriber: TranscriberPort,
     @Inject(TRANSLATOR) private readonly translator: TranslatorPort,
     @Inject(EVENT_PUBLISHER) private readonly publisher: EventPublisherPort,

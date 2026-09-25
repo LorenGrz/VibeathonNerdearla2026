@@ -434,6 +434,19 @@ docker compose down
 
 ---
 
+## Micrófono
+
+Subtitular hablando al micrófono del navegador (fuente `mic`):
+
+1. En `/admin` creá una sesión con fuente **Micrófono** y tocá **Iniciar**.
+2. En la fila de la sesión abrí **Micrófono** (`/admin/mic/<id>`), tocá **Iniciar micrófono** y aceptá el permiso (requiere `localhost` o HTTPS).
+3. El navegador captura con un AudioWorklet (`public/worklets/pcm-capture.js`), convierte a PCM Int16 16 kHz mono en tramas de 100 ms (`src/features/mic/pcm.ts`) y las envía por Socket.IO a `/mic` (`mic:start`, `mic:chunk`, `mic:stop`).
+4. La API (`MicGateway` → `MicAudioSource`, detrás de `CompositeAudioSource`) acepta un solo emisor por sesión y descarta el audio más viejo si la cola supera 2 s.
+
+Con `TRANSCRIBER=live` y `GEMINI_API_KEY` los subtítulos salen en `/s/<id>`. Detener el micrófono no detiene la sesión: se detiene desde el panel.
+
+---
+
 ## License
 
 MIT — see [LICENSE](LICENSE)
