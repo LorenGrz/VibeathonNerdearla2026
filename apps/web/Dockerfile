@@ -1,62 +1,51 @@
-# Build stage
-FROM node:22-slim AS builder
-
-# Enable corepack for pnpm
-RUN corepack enable
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
-# Copy workspace root files
+RUN corepack enable && corepack prepare pnpm@10.5.2 --activate
+
+# Copy workspace manifests and root tsconfig
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json ./
+COPY packages/domain/package.json ./packages/domain/
+COPY apps/web/package.json ./apps/web/
 
-# Copy domain package
-COPY packages/domain ./packages/domain
-
-# Copy web package
-COPY apps/web ./apps/web
-
-# Install with frozen lockfile
+# Install all dependencies for build
 RUN pnpm install --frozen-lockfile
 
-# Build domain first (shared by web)
-RUN pnpm build:domain
+# Copy source code
+COPY packages/domain ./packages/domain
+COPY apps/web ./apps/web
 
-# Build Next.js app (with NEXT_PUBLIC_API_URL injected via build arg or env)
 ARG NEXT_PUBLIC_API_URL=http://localhost:4000
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
-RUN pnpm --filter @subs/web build
 
-# Runtime stage
-FROM node:22-slim
+# Build domain and web application
+RUN pnpm --filter @subs/domain build && pnpm --filter @subs/web build
 
-# Enable corepack for pnpm
-RUN corepack enable
+# Production runner stage
+FROM node:22-alpine AS runner
 
 WORKDIR /app
 
-# Copy workspace root files
+RUN corepack enable && corepack prepare pnpm@10.5.2 --activate
+
+# Copy workspace manifests
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-
-# Copy domain package (source for reference)
-COPY packages/domain ./packages/domain
-
-# Copy web package (source for next config and public assets)
-COPY apps/web ./apps/web
+COPY packages/domain/package.json ./packages/domain/
+COPY apps/web/package.json ./apps/web/
 
 # Install production dependencies only
-RUN pnpm install --frozen-lockfile --prod
+RUN pnpm install --prod --frozen-lockfile
 
-# Copy built Next.js app from builder stage
+# Copy built artifacts
 COPY --from=builder /app/packages/domain/dist ./packages/domain/dist
 COPY --from=builder /app/apps/web/.next ./apps/web/.next
 COPY --from=builder /app/apps/web/public ./apps/web/public
 
-# Expose web port
+ENV NODE_ENV=production
+ENV PORT=3000
+ENV NEXT_PUBLIC_API_URL=http://localhost:4000
+
 EXPOSE 3000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:3000', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"
-
-# Start Next.js
 CMD ["pnpm", "--filter", "@subs/web", "start"]
