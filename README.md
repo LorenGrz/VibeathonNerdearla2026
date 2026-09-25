@@ -148,7 +148,7 @@ Then repeat the quickstart steps, but:
 
 ```
 PORT=4000
-WEB_ORIGIN=http://localhost:3000
+WEB_ORIGIN=http://localhost:3000   # comma-separated list allowed
 TRANSCRIBER=mock           # live | chunked | mock
 TRANSLATOR=mock            # gemini | mock
 GEMINI_API_KEY=            # Required for live/gemini modes
@@ -173,7 +173,7 @@ The `samples/` directory includes:
   ```bash
   scripts/fetch-samples.sh
   ```
-  (Script contains TODO for actual talk URLs and attribution)
+  (Talks: "Model Context Protocol in Plain English" — Nate Barbettini, and "No sos Netflix" — J. Rodríguez Monti; see `samples/README.md`. Clips are git-ignored.)
 
 ### OBS Integration
 
@@ -355,7 +355,7 @@ TRANSCRIBER=live TRANSLATOR=gemini pnpm dev
 
 ```
 PORT=4000
-WEB_ORIGIN=http://localhost:3000
+WEB_ORIGIN=http://localhost:3000   # comma-separated list allowed
 TRANSCRIBER=mock|live|chunked
 TRANSLATOR=mock|gemini
 GEMINI_API_KEY=

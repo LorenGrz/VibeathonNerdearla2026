@@ -87,71 +87,38 @@ gateway.io.adapter(redisAdapter);
 
 ## Gemini API Quotas & Limits
 
-### Concurrent Session Limits
+The real ceiling is not CPU but the Gemini quota of your project: concurrent Live sessions,
+requests per minute and tokens per minute. They depend on your tier and change over time, so
+check them before the event instead of trusting a number in this file:
 
-- **Gemini Live API:** ~10 concurrent sessions per project
-- **Per-project rate limit:** ~1000 requests per minute (Text and Streaming combined)
-- See current limits: https://ai.google.dev/gemini-api/docs/quota
+- Rate limits per tier: https://ai.google.dev/gemini-api/docs/rate-limits
+- A Live transcription connection lasts about 10 minutes; the transcriber reconnects
+  transparently (see `apps/api/src/transcription/gemini-live.transcriber.ts`).
 
-### Streaming Token Quota
+Rule of thumb: **1 stage = 1 Live connection** + 1 `generateContent` call per final segment
+and target language.
 
-Gemini Live API has a monthly streaming quota (varies by plan).
+## Cost Estimation
 
-- **Free tier:** 50,000 tokens/month (for all endpoints)
-- **Paid tier:** 10M tokens/month (standard)
-
-One hour of audio → ~30,000–50,000 tokens (depends on content density and language).
-
-### Translation Cost Estimation
-
-**Per-segment translation (Gemini 2.5 Flash):**
-
-- Typical segment: 50–200 characters
-- Average output: ~100 characters
-- Cost: ~0.00001 per input token + 0.00001 per output token
-
-**Formula for one-hour event:**
+Prices change; take them from https://ai.google.dev/gemini-api/docs/pricing and plug them
+into this formula:
 
 ```
-Assume:
-  - 60 min audio
-  - 1 segment per 3 sec (realistic for live speech)
-  - English audio: 4 tokens/word, ~4 words/sentence, ~1 sentence per segment
-  - Average segment: ~150 tokens input, ~150 tokens output
+per stage-hour =
+    live_audio_price_per_hour                       # transcription (Live API, audio input)
+  + S * L * (T_in * price_in + T_out * price_out)   # translation (text model)
 
-Segments = 60 * 60 / 3 = 1200 segments
-Input tokens = 1200 * 150 = 180,000
-Output tokens (per language) = 1200 * 150 = 180,000
+S     = final segments per hour        (~1 every 3-5 s of speech -> 700-1200)
+L     = target languages for that stage
+T_in  = input tokens per call          (prompt + glossary + 2 context sentences + segment)
+T_out = output tokens per call         (the translated sentence)
 
-For 2 target languages (EN → [ES, PT]):
-  Total input tokens ≈ 180,000
-  Total output tokens ≈ 360,000 (2 languages)
-
-Cost (2.5 Flash pricing):
-  Input: 180,000 * $0.0000075 = $1.35
-  Output: 360,000 * $0.00003 = $10.80
-  Total translation ≈ $12.15 per hour per pair
+event total = sum over stages of (per stage-hour * hours streamed)
 ```
 
-**Gemini Live (streaming transcription):**
+Levers that lower cost:
 
-- 1 hour audio = ~1M tokens
-- Cost: ~$0.0075 per 1k tokens = **$7.50/hour**
-
-**Total per hour (EN transcription + EN→ES + EN→PT):**
-
-```
-Live transcription: $7.50
-Translation EN→ES: $6.08
-Translation EN→PT: $6.08
-Total ≈ $19.66/hour
-```
-
-See official pricing: https://ai.google.dev/gemini-api/docs/pricing
-
-### Cost Reduction Strategies
-
-1. **Chunked fallback:** Use `generateContent` every ~4–5 sec instead of Live API for pre-recorded content (cheaper, higher latency).
+1. **Chunked fallback:** Use `generateContent` every ~4–5 sec instead of the Live API (higher latency; compare both prices before choosing).
 2. **Language filters:** Only translate to requested languages; don't translate all pairs.
 3. **Segment batching:** Batch small segments before translation (reduces API calls).
 4. **Glossary caching:** Cache translation results for known terms (glossary).
@@ -201,9 +168,11 @@ The Next.js frontend is **stateless**:
 
 ## Summary
 
-| Scale      | Sessions | Setup          | Bottleneck   | Cost (1 hr)                     |
-| ---------- | -------- | -------------- | ------------ | ------------------------------- |
-| Vertical   | ≤ 10–12  | 1 instance     | Gemini quota | $19.66                          |
-| Horizontal | 50+      | Redis + 5× API | Gemini quota | $98+ (proportional to sessions) |
+| Scale      | Sessions                      | Setup                   | Bottleneck          |
+| ---------- | ----------------------------- | ----------------------- | ------------------- |
+| Vertical   | up to `MAX_SESSIONS` per node | 1 API instance          | Gemini quota        |
+| Horizontal | 30+ stages                    | N API instances + Redis | Gemini quota / tier |
 
-For Nerdearla 2026 (2 concurrent sessions, 2 hours), **Vertical on cloud instance (4 vCPU, 8 GB) is sufficient** with ~$40 total Gemini cost.
+For a Nerdearla-sized event (30+ English sessions, several in parallel), plan one API instance
+per ~`MAX_SESSIONS` stages, share Socket.IO through the Redis adapter, and raise the Gemini
+tier ahead of time.
