@@ -121,7 +121,7 @@ export function SessionsTable({ sessions, onStart, onStop, onDelete }: SessionsT
                           onClick={() => onStart(session.id)}
                           className="rounded-btn bg-brand hover:bg-brand-bright px-3 py-1 text-xs font-semibold text-white shadow-sm transition-all"
                         >
-                          Iniciar
+                          {session.status === 'stopped' ? '🔄 Reiniciar' : 'Iniciar'}
                         </button>
                       )}
                       <Link

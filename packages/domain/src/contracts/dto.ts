@@ -5,7 +5,7 @@ export type SessionStatus = 'idle' | 'starting' | 'live' | 'stopped' | 'error';
 export type SegmentKind = 'original' | 'translation';
 
 export type AudioSourceSpec =
-  | { kind: 'file'; path: string } // relative to samples/ or absolute
+  | { kind: 'file'; path: string; loop?: boolean } // relative to samples/ or absolute
   | { kind: 'url'; url: string } // HLS/RTMP/Icecast/YouTube (yt-dlp)
   | { kind: 'mic' }; // PCM over WS from the browser
 

@@ -31,7 +31,7 @@ export function buildDemoSessions(samples: string[]): [CreateSessionDto, CreateS
   if (!esFile) return null;
   used.add(esFile);
 
-  const fileSource = (path: string): AudioSourceSpec => ({ kind: 'file', path });
+  const fileSource = (path: string): AudioSourceSpec => ({ kind: 'file', path, loop: true });
   const esTarget: LanguageCodeValue = 'es';
   const enTarget: LanguageCodeValue = 'en';
 

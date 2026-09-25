@@ -35,6 +35,7 @@ const EMPTY_VALUES: SessionFormValues = {
   sourceKind: 'file',
   sourceFile: '',
   sourceUrl: '',
+  sourceLoop: true,
 };
 
 interface NewSessionFormProps {
@@ -69,7 +70,7 @@ export function NewSessionForm({ samples, samplesError, onCreate }: NewSessionFo
 
     const source: AudioSourceSpec =
       values.sourceKind === 'file'
-        ? { kind: 'file', path: values.sourceFile }
+        ? { kind: 'file', path: values.sourceFile, loop: values.sourceLoop }
         : values.sourceKind === 'url'
           ? { kind: 'url', url: values.sourceUrl }
           : { kind: 'mic' };
@@ -279,6 +280,17 @@ export function NewSessionForm({ samples, samplesError, onCreate }: NewSessionFo
               {errors.sourceFile ? (
                 <span className="text-xs text-brand-soft">{errors.sourceFile}</span>
               ) : null}
+              <label className="flex items-center gap-2 pt-1 text-xs text-text-soft cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={values.sourceLoop ?? true}
+                  onChange={(event) =>
+                    setValues((prev) => ({ ...prev, sourceLoop: event.target.checked }))
+                  }
+                  className="rounded border-line-strong text-accent focus:ring-accent"
+                />
+                <span>Repetir audio en bucle continuo (recomendado para demos)</span>
+              </label>
             </div>
           ) : null}
 

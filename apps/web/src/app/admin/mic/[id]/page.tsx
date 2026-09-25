@@ -40,6 +40,7 @@ export default async function MicPage(props: PageProps<'/admin/mic/[id]'>) {
         sessionId={result.session.id}
         title={result.session.title}
         stage={result.session.stage}
+        sourceLanguage={result.session.sourceLanguage}
       />
     );
   }

@@ -10,6 +10,7 @@ export interface SessionFormValues {
   sourceKind: SourceKind;
   sourceFile: string;
   sourceUrl: string;
+  sourceLoop?: boolean;
 }
 
 export type SessionFormErrors = Partial<Record<keyof SessionFormValues, string>>;

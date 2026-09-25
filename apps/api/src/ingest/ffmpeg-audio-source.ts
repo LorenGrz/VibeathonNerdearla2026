@@ -38,9 +38,11 @@ export class FfmpegAudioSource implements AudioSourcePort {
 
   async *open(spec: AudioSourceSpec, signal: AbortSignal): AsyncIterable<AudioChunk> {
     switch (spec.kind) {
-      case 'file':
-        yield* this.runFfmpeg(['-i', this.resolveFilePath(spec.path)], signal);
+      case 'file': {
+        const loopArgs = spec.loop ? ['-stream_loop', '-1'] : [];
+        yield* this.runFfmpeg([...loopArgs, '-i', this.resolveFilePath(spec.path)], signal);
         return;
+      }
       case 'url':
         yield* this.openUrl(spec.url, signal);
         return;

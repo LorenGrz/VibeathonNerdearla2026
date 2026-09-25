@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 const audioSourceSchema = z.discriminatedUnion('kind', [
-  z.object({ kind: z.literal('file'), path: z.string().min(1) }),
+  z.object({ kind: z.literal('file'), path: z.string().min(1), loop: z.boolean().optional() }),
   z.object({ kind: z.literal('url'), url: z.string().min(1) }),
   z.object({ kind: z.literal('mic') }),
 ]);

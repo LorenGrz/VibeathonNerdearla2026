@@ -4,6 +4,7 @@ import { Badge } from '@/components/Badge';
 import { buttonClassName } from '@/components/Button';
 import { EmptyState } from '@/components/EmptyState';
 import { Header } from '@/components/Header';
+import { QuickDemoButton } from '@/components/QuickDemoButton';
 import { fetchSessions, languageLabel, sessionLanguages } from '@/lib/api';
 
 export const dynamic = 'force-dynamic';
@@ -23,12 +24,13 @@ function sourceIcon(kind: string) {
 function SessionCard({ session }: { session: SessionDto }) {
   const languages = sessionLanguages(session);
   const isLive = session.status === 'live';
+  const defaultTarget = session.targetLanguages[0] ?? session.sourceLanguage;
 
   return (
     <li
       className={`group flex flex-col justify-between gap-4 rounded-cta border p-5 transition-all duration-200 ${
         isLive
-          ? 'border-brand/50 bg-surface-2 shadow-[0_0_25px_-5px_rgba(224,40,50,0.18)]'
+          ? 'border-brand/50 bg-surface-2 shadow-[0_0_25px_-5px_rgba(224,40,50,0.18)] ring-1 ring-brand/30'
           : 'border-line bg-surface-2/80 hover:border-line-strong'
       }`}
     >
@@ -44,9 +46,12 @@ function SessionCard({ session }: { session: SessionDto }) {
                 {sourceIcon(session.source.kind)}
               </span>
             </div>
-            <h2 className="font-display text-xl font-bold uppercase tracking-tight text-text group-hover:text-accent transition-colors">
+            <Link
+              href={`/s/${session.id}?lang=${defaultTarget}`}
+              className="font-display text-xl font-bold uppercase tracking-tight text-text group-hover:text-accent transition-colors"
+            >
               {session.title}
-            </h2>
+            </Link>
           </div>
           <Badge tone={isLive ? 'live' : 'neutral'}>{session.status}</Badge>
         </div>
@@ -63,9 +68,17 @@ function SessionCard({ session }: { session: SessionDto }) {
       </div>
 
       <div className="flex flex-col gap-2 pt-2 border-t border-line/60">
-        <p className="text-xs uppercase tracking-wider text-text-muted font-display">
-          Elegir idioma de subtítulos:
-        </p>
+        <div className="flex items-center justify-between">
+          <p className="text-xs uppercase tracking-wider text-text-muted font-display">
+            Elegir idioma:
+          </p>
+          <Link
+            href={`/s/${session.id}?lang=${defaultTarget}`}
+            className="text-xs font-semibold text-accent hover:underline"
+          >
+            Abrir sala ↗
+          </Link>
+        </div>
         <div className="flex flex-wrap items-center gap-2">
           {languages.map((lang) => {
             const isTarget = session.targetLanguages.includes(lang);
@@ -82,7 +95,7 @@ function SessionCard({ session }: { session: SessionDto }) {
             );
           })}
           <Link
-            href={`/overlay/${session.id}?lang=${session.targetLanguages[0] ?? session.sourceLanguage}`}
+            href={`/overlay/${session.id}?lang=${defaultTarget}`}
             target="_blank"
             className="ml-auto text-xs text-text-muted hover:text-teal transition-colors"
             title="Abrir vista overlay para OBS / streaming"
@@ -102,19 +115,30 @@ export default async function HomePage() {
     <div className="flex flex-1 flex-col">
       <Header />
       <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-8 px-4 py-8 sm:px-6">
-        <div className="flex flex-col gap-3">
-          <div className="flex items-center gap-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-            <p className="font-display text-xs uppercase tracking-widest text-text-muted">
-              Live AI Captions & Translations · Nerdearla 2026
+        <div className="flex flex-wrap items-center justify-between gap-6">
+          <div className="flex flex-col gap-3 max-w-2xl">
+            <div className="flex items-center gap-2">
+              <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+              <p className="font-display text-xs uppercase tracking-widest text-text-muted">
+                Live AI Captions & Translations · Nerdearla 2026
+              </p>
+            </div>
+            <h1 className="font-display text-4xl sm:text-5xl font-bold uppercase leading-none tracking-tight text-text">
+              Subtítulos en vivo, <span className="text-accent">para toda la comunidad</span>
+            </h1>
+            <p className="text-text-soft text-sm sm:text-base">
+              Seguí cualquier charla de la conferencia con transcripción simultánea y traducción automática impulsada por Google Gemini Live.
             </p>
           </div>
-          <h1 className="font-display text-4xl sm:text-5xl font-bold uppercase leading-none tracking-tight text-text">
-            Subtítulos en vivo, <span className="text-accent">para toda la comunidad</span>
-          </h1>
-          <p className="max-w-2xl text-text-soft text-sm sm:text-base">
-            Seguí cualquier charla de la conferencia con transcripción simultánea y traducción automática impulsada por Google Gemini Live.
-          </p>
+          <div className="flex flex-col gap-2">
+            <QuickDemoButton />
+            <Link
+              href="/admin"
+              className="text-center text-xs text-text-muted hover:text-text transition-colors"
+            >
+              Ir al panel de producción →
+            </Link>
+          </div>
         </div>
 
         {result.status === 'error' ? (
@@ -125,7 +149,7 @@ export default async function HomePage() {
           />
         ) : result.sessions.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-4 rounded-cta border border-line bg-surface-2 p-12 text-center">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-surface border border-line">
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-surface border border-line text-2xl">
               🎙️
             </div>
             <div className="flex flex-col gap-1">
@@ -133,12 +157,15 @@ export default async function HomePage() {
                 Todavía no hay sesiones activas
               </h3>
               <p className="text-sm text-text-soft max-w-md">
-                Podés crear una nueva sesión o lanzar la demo en paralelo desde el panel de producción.
+                Podés lanzar la demo multi-sala instantáneamente para probar la transcripción y traducción en tiempo real.
               </p>
             </div>
-            <Link href="/admin" className={buttonClassName('primary')}>
-              Ir al panel de producción
-            </Link>
+            <div className="flex flex-wrap items-center justify-center gap-3 mt-2">
+              <QuickDemoButton />
+              <Link href="/admin" className={buttonClassName('secondary')}>
+                Ir al panel de producción
+              </Link>
+            </div>
           </div>
         ) : (
           <div className="flex flex-col gap-4">
