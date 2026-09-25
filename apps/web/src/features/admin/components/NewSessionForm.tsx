@@ -98,12 +98,82 @@ export function NewSessionForm({ samples, samplesError, onCreate }: NewSessionFo
     }
   };
 
+  const applyPreset = (type: 'keynote' | 'devops' | 'mic') => {
+    if (type === 'keynote') {
+      const sample = samples.find((s) => s.includes('en-nerdearla')) ?? samples[0] ?? '';
+      setValues({
+        title: 'Keynote de Apertura (EN → ES)',
+        stage: 'Escenario Principal',
+        sourceLanguage: 'en',
+        targetLanguages: ['es'],
+        sourceKind: 'file',
+        sourceFile: sample,
+        sourceUrl: '',
+      });
+      setGlossaryText('MCP = Protocolo de Contexto de Modelo\nprimitives = primitivas');
+    } else if (type === 'devops') {
+      const sample = samples.find((s) => s.includes('es-nerdearla')) ?? samples[0] ?? '';
+      setValues({
+        title: 'Panel Arquitectura Cloud (ES → EN)',
+        stage: 'Escenario B',
+        sourceLanguage: 'es',
+        targetLanguages: ['en'],
+        sourceKind: 'file',
+        sourceFile: sample,
+        sourceUrl: '',
+      });
+      setGlossaryText('Kubernetes = K8s\ndespliegue = deployment');
+    } else if (type === 'mic') {
+      setValues({
+        title: 'Transmisión con Micrófono',
+        stage: 'Escenario Mic',
+        sourceLanguage: 'es',
+        targetLanguages: ['en'],
+        sourceKind: 'mic',
+        sourceFile: '',
+        sourceUrl: '',
+      });
+    }
+    setErrors({});
+  };
+
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col gap-4 rounded-cta border border-line bg-surface-2 p-6"
+      className="flex flex-col gap-6 rounded-cta border border-line bg-surface-2 p-6"
     >
-      <h2 className="font-display text-xl uppercase">Nueva sesión</h2>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 className="font-display text-xl uppercase font-bold text-text">Crear nueva sesión</h2>
+          <p className="text-xs text-text-muted">
+            Configura el escenario, audio de entrada, idiomas y glosario personalizado.
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-1.5 text-xs">
+          <span className="text-text-muted font-display uppercase">Plantillas rápidas:</span>
+          <button
+            type="button"
+            onClick={() => applyPreset('keynote')}
+            className="rounded-btn border border-line bg-surface hover:border-accent hover:text-accent px-2 py-1 transition-colors"
+          >
+            ⚡ Keynote EN→ES
+          </button>
+          <button
+            type="button"
+            onClick={() => applyPreset('devops')}
+            className="rounded-btn border border-line bg-surface hover:border-accent hover:text-accent px-2 py-1 transition-colors"
+          >
+            ⚡ Panel ES→EN
+          </button>
+          <button
+            type="button"
+            onClick={() => applyPreset('mic')}
+            className="rounded-btn border border-line bg-surface hover:border-teal hover:text-teal px-2 py-1 transition-colors"
+          >
+            🎙️ Micrófono
+          </button>
+        </div>
+      </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="flex flex-col gap-1 text-sm">

@@ -53,15 +53,33 @@ export function CaptionFeed({
         } ${fontSizeClassName}`}
       >
         {isEmpty ? (
-          <p className="text-text-muted">Esperando subtítulos…</p>
+          <div className="flex h-full flex-col items-center justify-center gap-3 p-8 text-center">
+            <div className="flex items-center gap-1.5 py-2" aria-hidden="true">
+              <span className="h-6 w-1.5 rounded-full bg-teal animate-pulse" />
+              <span className="h-10 w-1.5 rounded-full bg-accent animate-pulse [animation-delay:150ms]" />
+              <span className="h-4 w-1.5 rounded-full bg-brand animate-pulse [animation-delay:300ms]" />
+            </div>
+            <p className="font-display text-lg uppercase font-semibold text-text">
+              Esperando subtítulos…
+            </p>
+            <p className="text-xs text-text-muted max-w-sm">
+              El motor de Gemini está conectado y escuchando en tiempo real.
+            </p>
+          </div>
         ) : (
-          <ul className="space-y-2">
+          <ul className="space-y-3.5 p-2">
             {finals.map((caption) => (
-              <li key={caption.id}>{caption.text}</li>
+              <li key={caption.id} className="leading-relaxed">
+                {caption.text}
+              </li>
             ))}
             {partial ? (
-              <li key={partial.id} className="text-text-muted italic">
+              <li
+                key={partial.id}
+                className="border-l-2 border-accent pl-3 text-accent/90 italic leading-relaxed"
+              >
                 {partial.text}
+                <span className="inline-block w-1.5 h-4 ml-1.5 bg-accent align-middle animate-pulse" />
               </li>
             ) : null}
           </ul>

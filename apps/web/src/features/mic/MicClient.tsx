@@ -90,9 +90,20 @@ export function MicClient({ sessionId, title, stage }: MicClientProps) {
 
         <VuMeter level={level} />
 
-        <div className="flex items-baseline gap-2">
-          <span className="font-display text-4xl font-bold text-accent">{seconds} s</span>
-          <span className="text-xs uppercase text-text-muted">de audio enviado</span>
+        <div className="flex items-center justify-between">
+          <div className="flex items-baseline gap-2">
+            <span className="font-display text-4xl font-bold text-accent">{seconds} s</span>
+            <span className="text-xs uppercase text-text-muted">de audio transmitido</span>
+          </div>
+          {phase === 'streaming' ? (
+            <span className="inline-flex items-center gap-1.5 text-xs text-teal font-medium">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-teal opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-teal" />
+              </span>
+              En el aire
+            </span>
+          ) : null}
         </div>
 
         {error ? (
@@ -102,13 +113,22 @@ export function MicClient({ sessionId, title, stage }: MicClientProps) {
         ) : null}
       </div>
 
-      <p className="text-sm text-text-soft">
-        El audio solo se transcribe mientras la sesión está iniciada en el panel. Un solo navegador
-        puede transmitir por sesión.
+      <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
+        <Link href="/admin" className={buttonClassName('ghost')}>
+          ← Volver al panel
+        </Link>
+        <Link
+          href={`/s/${sessionId}`}
+          target="_blank"
+          className={buttonClassName('secondary', { className: 'text-xs' })}
+        >
+          Abrir pantalla de audiencia ↗
+        </Link>
+      </div>
+
+      <p className="text-xs text-text-muted">
+        Nota: El audio solo se procesa mientras la sesión esté con estado «En vivo» en el panel de producción.
       </p>
-      <Link href="/admin" className={buttonClassName('ghost', { className: 'self-start' })}>
-        Volver al panel
-      </Link>
     </section>
   );
 }
