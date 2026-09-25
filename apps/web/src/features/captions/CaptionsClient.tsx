@@ -12,8 +12,16 @@ import type { FontSize } from './usePreferences';
 import { useCaptionPreferences } from './usePreferences';
 import { useCaptions } from './useCaptions';
 
+import { captionsAt, playheadMs } from '@/features/sync/programClock';
+import { useProgramClock } from '@/features/sync/useProgramClock';
 import type { VideoInfo } from '@/features/video/videoSource';
 import { VideoPlayer } from '@/features/video/VideoPlayer';
+
+/**
+ * Originals arrive as partials within ~1 s. Translations wait for a final (utterances are capped
+ * at 12 s) plus a Gemini call, so the video must trail the live audio by ~14 s.
+ */
+const DEFAULT_DELAY_S = { original: 3, translation: 14 } as const;
 
 const FONT_SIZE_CLASSES: Record<FontSize, string> = {
   sm: 'text-sm sm:text-base',
@@ -48,6 +56,21 @@ export function CaptionsClient({
   );
   const { preferences, increaseFontSize, decreaseFontSize, toggleHighContrast } =
     useCaptionPreferences();
+
+  const isOriginal = language === languages[0];
+  const [delayOverrides, setDelayOverrides] = useState<Partial<Record<LanguageCodeValue, number>>>(
+    {},
+  );
+  const delaySeconds =
+    delayOverrides[language] ??
+    (isOriginal ? DEFAULT_DELAY_S.original : DEFAULT_DELAY_S.translation);
+  const syncing = showSplitVideo && Boolean(videoInfo);
+  const audioMs = useProgramClock(sessionId, syncing);
+  // With the video open, captions follow the delayed playhead instead of arriving "early".
+  const shown =
+    syncing && audioMs !== null
+      ? captionsAt(finals, partial, playheadMs(audioMs, delaySeconds * 1000))
+      : { finals, partial };
 
   useEffect(() => {
     const handleFsChange = () => {
@@ -119,7 +142,9 @@ export function CaptionsClient({
       {videoInfo ? (
         <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-accent/30 bg-accent/5 px-3 py-2 text-xs">
           <div className="flex items-center gap-2">
-            <span className="font-display font-bold uppercase text-accent">Video sincronizado disponible</span>
+            <span className="font-display font-bold uppercase text-accent">
+              Video sincronizado disponible
+            </span>
             <span className="text-text-muted hidden sm:inline">· {videoInfo.title}</span>
           </div>
           <div className="flex items-center gap-2">
@@ -146,13 +171,23 @@ export function CaptionsClient({
         </div>
       ) : null}
 
-      <div className={`grid gap-4 w-full ${showSplitVideo && videoInfo ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1'}`}>
+      <div
+        className={`grid gap-4 w-full ${showSplitVideo && videoInfo ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1'}`}
+      >
         {showSplitVideo && videoInfo ? (
-          <VideoPlayer video={videoInfo} onClose={() => setShowSplitVideo(false)} />
+          <VideoPlayer
+            video={videoInfo}
+            audioMs={audioMs}
+            delaySeconds={delaySeconds}
+            onDelayChange={(seconds) =>
+              setDelayOverrides((prev) => ({ ...prev, [language]: seconds }))
+            }
+            onClose={() => setShowSplitVideo(false)}
+          />
         ) : null}
         <CaptionFeed
-          finals={finals}
-          partial={partial}
+          finals={shown.finals}
+          partial={shown.partial}
           fontSizeClassName={FONT_SIZE_CLASSES[preferences.fontSize]}
           highContrast={preferences.highContrast}
           sessionStatus={sessionStatus}
