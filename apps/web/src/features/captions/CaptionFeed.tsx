@@ -12,6 +12,63 @@ function formatTimestamp(ms: number): string {
   return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 }
 
+export interface CaptionParagraph {
+  id: string;
+  startMs: number;
+  endMs: number;
+  language: string;
+  kind: string;
+  text: string;
+}
+
+export function groupCaptionsIntoParagraphs(
+  captions: CaptionDto[],
+  maxGapMs = 6000,
+): CaptionParagraph[] {
+  if (captions.length === 0) return [];
+  const paragraphs: CaptionParagraph[] = [];
+  let current: CaptionParagraph | null = null;
+
+  for (const c of captions) {
+    const text = c.text.trim();
+    if (!text) continue;
+
+    if (!current) {
+      current = {
+        id: c.id,
+        startMs: c.startMs,
+        endMs: c.endMs,
+        language: c.language,
+        kind: c.kind,
+        text,
+      };
+      continue;
+    }
+
+    const isSameKind = current.kind === c.kind && current.language === c.language;
+    const isClose = c.startMs - current.endMs <= maxGapMs;
+    const isUnderMax = current.text.length < 320;
+
+    if (isSameKind && isClose && isUnderMax) {
+      current.text = `${current.text} ${text}`;
+      current.endMs = Math.max(current.endMs, c.endMs);
+    } else {
+      paragraphs.push(current);
+      current = {
+        id: c.id,
+        startMs: c.startMs,
+        endMs: c.endMs,
+        language: c.language,
+        kind: c.kind,
+        text,
+      };
+    }
+  }
+
+  if (current) paragraphs.push(current);
+  return paragraphs;
+}
+
 export interface CaptionFeedProps {
   finals: CaptionDto[];
   partial: CaptionDto | null;
@@ -53,6 +110,7 @@ export function CaptionFeed({
 
   const isEmpty = finals.length === 0 && !partial;
   const isLive = sessionStatus === 'live';
+  const paragraphs = groupCaptionsIntoParagraphs(finals);
 
   return (
     <div className="relative flex flex-col flex-1 min-h-[420px] h-[calc(100dvh-17rem)] rounded-cta border border-line bg-surface-2 overflow-hidden shadow-sm">
@@ -152,10 +210,10 @@ export function CaptionFeed({
           </div>
         ) : (
           <div className="space-y-4">
-            {finals.map((caption) => (
+            {paragraphs.map((paragraph) => (
               <article
-                key={caption.id}
-                className={`group rounded-xl border p-4 transition-all duration-300 animate-in fade-in slide-in-from-bottom-2 ${
+                key={paragraph.id}
+                className={`group rounded-xl border p-4 transition-all duration-300 animate-in fade-in slide-in-from-bottom-1 ${
                   highContrast
                     ? 'border-zinc-800 bg-zinc-950 text-white'
                     : 'border-line/60 bg-surface/70 text-text shadow-sm hover:border-line'
@@ -163,14 +221,16 @@ export function CaptionFeed({
               >
                 <div className="flex items-center justify-between gap-2 mb-2 text-xs text-text-muted font-display select-none">
                   <span className="font-mono text-[11px] text-text-soft">
-                    {formatTimestamp(caption.startMs)}
+                    {formatTimestamp(paragraph.startMs)}
                   </span>
                   <span className="rounded bg-surface px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-accent font-semibold">
-                    {caption.kind === 'translation' ? `${caption.language.toUpperCase()} · IA` : `${caption.language.toUpperCase()} · Original`}
+                    {paragraph.kind === 'translation'
+                      ? `${paragraph.language.toUpperCase()} · IA`
+                      : `${paragraph.language.toUpperCase()} · Original`}
                   </span>
                 </div>
                 <p className="leading-relaxed font-sans font-normal">
-                  {caption.text}
+                  {paragraph.text}
                 </p>
               </article>
             ))}
@@ -203,7 +263,7 @@ export function CaptionFeed({
             {sessionStatus === 'stopped' && finals.length > 0 ? (
               <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-line bg-surface p-3 text-xs text-text-soft">
                 <span className="flex items-center gap-1.5">
-                  <span>⏹</span> Transmisión concluida · {finals.length} subtítulos generados
+                  <span>⏹</span> Transmisión concluida · {finals.length} segmentos procesados
                 </span>
                 {onRestart ? (
                   <button

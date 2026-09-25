@@ -12,11 +12,14 @@ import type { FontSize } from './usePreferences';
 import { useCaptionPreferences } from './usePreferences';
 import { useCaptions } from './useCaptions';
 
+import type { VideoInfo } from '@/features/video/videoSource';
+import { VideoPlayer } from '@/features/video/VideoPlayer';
+
 const FONT_SIZE_CLASSES: Record<FontSize, string> = {
-  sm: 'text-base sm:text-lg',
-  md: 'text-xl sm:text-2xl',
-  lg: 'text-2xl sm:text-3xl',
-  xl: 'text-3xl sm:text-4xl',
+  sm: 'text-sm sm:text-base',
+  md: 'text-base sm:text-lg',
+  lg: 'text-lg sm:text-xl',
+  xl: 'text-xl sm:text-2xl',
 };
 
 export interface CaptionsClientProps {
@@ -24,6 +27,7 @@ export interface CaptionsClientProps {
   languages: LanguageCodeValue[];
   initialLanguage: LanguageCodeValue;
   initialStatus?: SessionStatus;
+  videoInfo?: VideoInfo | null;
 }
 
 export function CaptionsClient({
@@ -31,10 +35,12 @@ export function CaptionsClient({
   languages,
   initialLanguage,
   initialStatus,
+  videoInfo,
 }: CaptionsClientProps) {
   const router = useRouter();
   const [language, setLanguage] = useState<LanguageCodeValue>(initialLanguage);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showSplitVideo, setShowSplitVideo] = useState(false);
   const { finals, partial, connectionStatus, sessionStatus } = useCaptions(
     sessionId,
     language,
@@ -93,7 +99,7 @@ export function CaptionsClient({
   }, [sessionId]);
 
   return (
-    <section className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-3 p-4 sm:p-6">
+    <section className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-3 p-4 sm:p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <LanguageSelector languages={languages} active={language} onChange={handleLanguageChange} />
         <ConnectionBadge status={connectionStatus} sessionStatus={sessionStatus} />
@@ -110,14 +116,49 @@ export function CaptionsClient({
         isFullscreen={isFullscreen}
       />
 
-      <CaptionFeed
-        finals={finals}
-        partial={partial}
-        fontSizeClassName={FONT_SIZE_CLASSES[preferences.fontSize]}
-        highContrast={preferences.highContrast}
-        sessionStatus={sessionStatus}
-        onRestart={handleRestart}
-      />
+      {videoInfo ? (
+        <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-accent/30 bg-accent/5 px-3 py-2 text-xs">
+          <div className="flex items-center gap-2">
+            <span className="font-display font-bold uppercase text-accent">Video sincronizado disponible</span>
+            <span className="text-text-muted hidden sm:inline">· {videoInfo.title}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setShowSplitVideo((prev) => !prev)}
+              className={`rounded px-2.5 py-1 font-display uppercase font-bold text-xs transition-all ${
+                showSplitVideo
+                  ? 'bg-accent text-ink shadow-sm'
+                  : 'border border-line bg-surface hover:bg-surface-2 text-text'
+              }`}
+            >
+              {showSplitVideo ? '✕ Cerrar Video Split' : '📺 Dividir Pantalla (Video + Subs)'}
+            </button>
+            <a
+              href={videoInfo.watchUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded border border-line bg-surface hover:bg-surface-2 px-2.5 py-1 text-text-soft hover:text-accent font-medium text-xs transition-colors"
+            >
+              Abrir en YouTube ↗
+            </a>
+          </div>
+        </div>
+      ) : null}
+
+      <div className={`grid gap-4 w-full ${showSplitVideo && videoInfo ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1'}`}>
+        {showSplitVideo && videoInfo ? (
+          <VideoPlayer video={videoInfo} onClose={() => setShowSplitVideo(false)} />
+        ) : null}
+        <CaptionFeed
+          finals={finals}
+          partial={partial}
+          fontSizeClassName={FONT_SIZE_CLASSES[preferences.fontSize]}
+          highContrast={preferences.highContrast}
+          sessionStatus={sessionStatus}
+          onRestart={handleRestart}
+        />
+      </div>
     </section>
   );
 }

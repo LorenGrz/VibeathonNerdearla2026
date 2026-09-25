@@ -6,6 +6,7 @@ import { EmptyState } from '@/components/EmptyState';
 import { Header } from '@/components/Header';
 import { CaptionsClient } from '@/features/captions/CaptionsClient';
 import { fetchSession, sessionLanguages } from '@/lib/api';
+import { resolveVideoInfo } from '@/features/video/videoSource';
 
 export default async function SessionPage(props: PageProps<'/s/[id]'>) {
   const { id } = await props.params;
@@ -39,6 +40,8 @@ export default async function SessionPage(props: PageProps<'/s/[id]'>) {
       ? requestedLang
       : session.sourceLanguage;
 
+  const videoInfo = resolveVideoInfo(session.source);
+
   return (
     <div className="flex flex-1 flex-col">
       <Header />
@@ -59,6 +62,7 @@ export default async function SessionPage(props: PageProps<'/s/[id]'>) {
           languages={languages}
           initialLanguage={initialLanguage}
           initialStatus={session.status}
+          videoInfo={videoInfo}
         />
       </main>
     </div>
