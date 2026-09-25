@@ -4,10 +4,15 @@ set -euo pipefail
 # Downloads ~90s clips from two past Nerdearla talks on YouTube and trims/transcodes them to
 # mono 64 kbps mp3 for use as demo audio sources (samples/en-nerdearla.mp3, samples/es-nerdearla.mp3).
 #
-# TODO(Loren): confirm these URLs point at an EN and an ES Nerdearla talk before running this
-# script. They are placeholders picked for illustration only.
-EN_TALK_URL="https://www.youtube.com/watch?v=REPLACE_WITH_EN_TALK_ID"
-ES_TALK_URL="https://www.youtube.com/watch?v=REPLACE_WITH_ES_TALK_ID"
+# Talks from the official Nerdearla YouTube channel. The clips are NOT committed (third-party
+# content); run this script to recreate them locally.
+# EN: "Model Context Protocol in Plain English" - Nate Barbettini (Nerdearla 2026)
+EN_TALK_URL="https://www.youtube.com/watch?v=iaG9pHMJ3Y4"
+# ES: "No sos Netflix" - J. Rodriguez Monti (Nerdearla 2026)
+ES_TALK_URL="https://www.youtube.com/watch?v=nGeiH6GSIuU"
+
+# Skip the stage intro so the clip starts with speech.
+CLIP_START_SECONDS=60
 
 CLIP_DURATION_SECONDS=90
 AUDIO_BITRATE="64k"
@@ -26,7 +31,7 @@ fetch_clip() {
   local downloaded
   downloaded="$(dirname "${tmp_file}")"/$(ls "$(dirname "${tmp_file}")")
 
-  ffmpeg -y -i "${downloaded}" -t "${CLIP_DURATION_SECONDS}" -ac 1 -b:a "${AUDIO_BITRATE}" "${out_file}"
+  ffmpeg -y -ss "${CLIP_START_SECONDS}" -i "${downloaded}" -t "${CLIP_DURATION_SECONDS}" -ac 1 -b:a "${AUDIO_BITRATE}" "${out_file}"
 
   rm -rf "$(dirname "${tmp_file}")"
 }
@@ -35,4 +40,4 @@ mkdir -p "${SAMPLES_DIR}"
 fetch_clip "${EN_TALK_URL}" "${SAMPLES_DIR}/en-nerdearla.mp3"
 fetch_clip "${ES_TALK_URL}" "${SAMPLES_DIR}/es-nerdearla.mp3"
 
-echo "Done. Update samples/README.md with the source URLs and license of each clip."
+echo "Done: samples/en-nerdearla.mp3 and samples/es-nerdearla.mp3"

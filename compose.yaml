@@ -1,0 +1,54 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    ports:
+      - '4000:4000'
+    environment:
+      PORT: '4000'
+      WEB_ORIGIN: 'http://localhost:3000'
+      SAMPLES_DIR: '/app/samples'
+    env_file:
+      - path: apps/api/.env
+        required: false
+    volumes:
+      - ./samples:/app/samples:ro
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "require('http').get('http://localhost:4000/api/health', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: 'http://localhost:4000'
+    ports:
+      - '3000:3000'
+    environment:
+      NEXT_PUBLIC_API_URL: 'http://localhost:4000'
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "require('http').get('http://localhost:3000', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s

@@ -70,7 +70,7 @@ export function SessionsTable({ sessions, onStart, onStop, onDelete }: SessionsT
                 <td className="px-4 py-3 text-text-soft">{session.stage}</td>
                 <td className="px-4 py-3">
                   <span
-                    className={`rounded-chip border px-3 py-1 text-xs uppercase ${STATUS_CLASS[session.status]}`}
+                    className={`whitespace-nowrap rounded-chip border px-3 py-1 text-xs uppercase ${STATUS_CLASS[session.status]}`}
                   >
                     {STATUS_LABEL[session.status]}
                   </span>

@@ -231,7 +231,9 @@ export function NewSessionForm({ samples, samplesError, onCreate }: NewSessionFo
         </fieldset>
 
         <label className="flex flex-col gap-1 text-sm sm:col-span-2">
-          Glosario (opcional, una línea por término: <code>término = traducción</code>)
+          <span>
+            Glosario (opcional, una línea por término: <code>término = traducción</code>)
+          </span>
           <textarea
             rows={4}
             value={glossaryText}
