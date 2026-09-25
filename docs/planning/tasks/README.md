@@ -1,6 +1,6 @@
 # Tablero de tareas — LiveSubs (Vibeathon Nerdearla 2026)
 
-Cada archivo `Txx-*.md` es un **prompt autocontenido** para un agente: objetivo, archivos, contrato y comando de aceptación. Plan general en [`../PLAN.md`](../PLAN.md). Contrato compartido en [`CONTRACT.md`](CONTRACT.md) — **ningún agente lo cambia sin pasar por un reasoner**.
+Cada archivo `Txx-*.md` es un **prompt autocontenido** para un agente: objetivo, archivos, contrato y comando de aceptación. Plan general en [`../PLAN.md`](../PLAN.md). Contrato compartido en [`CONTRACT.md`](../specs/CONTRACT.md) — **ningún agente lo cambia sin pasar por un reasoner**.
 
 ## Reglas para correr en paralelo
 1. Una ola arranca cuando la anterior está mergeada en `main`.
@@ -43,4 +43,4 @@ Cada archivo `Txx-*.md` es un **prompt autocontenido** para un agente: objetivo,
 | [T13](T13-optionals.md) | Fácil/Media | worker (sonnet) | Portugués, glosario editable, redis adapter |
 
 ## Cómo lanzar la Ola 1 (ejemplo)
-Un solo mensaje con 8 llamadas `Agent` en paralelo, cada una con `isolation: "worktree"`, `subagent_type` según la tabla (`worker` con `model: "haiku"` para las Fáciles) y como prompt: *"Implementá `docs/tasks/T0X-*.md`. Leé primero `docs/tasks/CONTRACT.md`. No edites archivos fuera de los listados. Terminá solo cuando pase el comando de aceptación."*
+Un solo mensaje con 8 llamadas `Agent` en paralelo, cada una con `isolation: "worktree"`, `subagent_type` según la tabla (`worker` con `model: "haiku"` para las Fáciles) y como prompt: *"Implementá `docs/planning/tasks/T0X-*.md`. Leé primero `docs/planning/specs/CONTRACT.md`. No edites archivos fuera de los listados. Terminá solo cuando pase el comando de aceptación."*

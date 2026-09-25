@@ -140,7 +140,7 @@ Then repeat the quickstart steps, but:
 **Model details:**
 
 - `GEMINI_LIVE_MODEL=gemini-3.5-transcribe-live` (streaming speech-to-text, verified 2026-09-25)
-- `GEMINI_TEXT_MODEL=gemini-2.5-flash` (translations + chunked fallback)
+- `GEMINI_TEXT_MODEL=gemini-3.5-flash-lite` (translations + chunked fallback)
 
 #### Environment Variables
 
@@ -153,7 +153,7 @@ TRANSCRIBER=mock           # live | chunked | mock
 TRANSLATOR=mock            # gemini | mock
 GEMINI_API_KEY=            # Required for live/gemini modes
 GEMINI_LIVE_MODEL=gemini-3.5-transcribe-live
-GEMINI_TEXT_MODEL=gemini-2.5-flash
+GEMINI_TEXT_MODEL=gemini-3.5-flash-lite
 MAX_SESSIONS=12            # Concurrent sessions per process
 SAMPLES_DIR=../../samples  # Relative to api distrib, or absolute path
 ```
@@ -431,6 +431,19 @@ docker compose down
 5. Deploy en Nerdearla en vivo.
 6. Métricas y monitoring.
 7. Editor de glosario en admin.
+
+---
+
+## Micrófono
+
+Subtitular hablando al micrófono del navegador (fuente `mic`):
+
+1. En `/admin` creá una sesión con fuente **Micrófono** y tocá **Iniciar**.
+2. En la fila de la sesión abrí **Micrófono** (`/admin/mic/<id>`), tocá **Iniciar micrófono** y aceptá el permiso (requiere `localhost` o HTTPS).
+3. El navegador captura con un AudioWorklet (`public/worklets/pcm-capture.js`), convierte a PCM Int16 16 kHz mono en tramas de 100 ms (`src/features/mic/pcm.ts`) y las envía por Socket.IO a `/mic` (`mic:start`, `mic:chunk`, `mic:stop`).
+4. La API (`MicGateway` → `MicAudioSource`, detrás de `CompositeAudioSource`) acepta un solo emisor por sesión y descarta el audio más viejo si la cola supera 2 s.
+
+Con `TRANSCRIBER=live` y `GEMINI_API_KEY` los subtítulos salen en `/s/<id>`. Detener el micrófono no detiene la sesión: se detiene desde el panel.
 
 ---
 

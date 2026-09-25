@@ -6,7 +6,7 @@ export const metadata: Metadata = {
 };
 
 // TODO(auth): sin autenticación en el MVP; este panel queda abierto a quien tenga la URL.
-// Fuera de alcance de T9 — ver docs/tasks/T09-web-admin.md.
+// Fuera de alcance de T9 — ver docs/planning/tasks/T09-web-admin.md.
 export default function AdminPage() {
   return <AdminDashboard />;
 }

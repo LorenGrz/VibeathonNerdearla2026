@@ -1,4 +1,4 @@
-/** Nest injection tokens for the domain ports (see docs/tasks/CONTRACT.md). */
+/** Nest injection tokens for the domain ports (see docs/planning/specs/CONTRACT.md). */
 export const AUDIO_SOURCE = Symbol('AUDIO_SOURCE');
 export const TRANSCRIBER = Symbol('TRANSCRIBER');
 export const TRANSLATOR = Symbol('TRANSLATOR');

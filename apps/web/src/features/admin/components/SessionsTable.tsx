@@ -125,6 +125,14 @@ export function SessionsTable({ sessions, onStart, onStop, onDelete }: SessionsT
                     <Link href={`/overlay/${session.id}`} className="text-xs text-teal underline">
                       Overlay
                     </Link>
+                    {session.source.kind === 'mic' ? (
+                      <Link
+                        href={`/admin/mic/${session.id}`}
+                        className="text-xs text-teal underline"
+                      >
+                        Micrófono
+                      </Link>
+                    ) : null}
                     <div className="flex flex-col gap-1 text-xs text-text-muted">
                       {sessionLanguages(session).map((lang) => (
                         <span key={lang} className="flex items-center gap-1">

@@ -46,7 +46,11 @@ export interface GeminiLiveTranscriberOptions {
   model: string;
   /** Finalize after this long without new text (delta mode). Default 700 ms. */
   silenceMs?: number;
-  /** Fallback finalize when the server sends interim hypotheses but no final. Default 2000 ms. */
+  /**
+   * Fallback finalize when the server sends interim hypotheses but no final. Default 6000 ms:
+   * at real-time pace Gemini can pause 2-3 s between hypotheses, and a shorter timer splits an
+   * utterance into one-word captions (and one translation call per word).
+   */
   interimSilenceMs?: number;
   /** Force a final once an utterance spans this much audio. Default 12 000 ms. */
   maxSegmentMs?: number;
@@ -80,7 +84,7 @@ export class GeminiLiveTranscriber implements TranscriberPort {
   ) {
     this.options = {
       silenceMs: 700,
-      interimSilenceMs: 2000,
+      interimSilenceMs: 6000,
       maxSegmentMs: 12_000,
       maxReconnectAttempts: 5,
       reconnectDelayMs: 500,

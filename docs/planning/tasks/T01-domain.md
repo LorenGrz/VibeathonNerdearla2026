@@ -2,7 +2,7 @@
 **Dificultad:** Difícil · **Agente:** `reasoner` (opus) · **Rama:** `feature/domain` · **Depende de:** T0 · **Bloquea:** Ola 1
 
 ## Objetivo
-Implementar `packages/domain` exactamente como define [`CONTRACT.md`](CONTRACT.md) (menos `export/`, que es T6). Es el único lugar con reglas de negocio; Nest y Next solo lo usan.
+Implementar `packages/domain` exactamente como define [`CONTRACT.md`](../specs/CONTRACT.md) (menos `export/`, que es T6). Es el único lugar con reglas de negocio; Nest y Next solo lo usan.
 
 ## Archivos
 `packages/domain/src/{shared,language,session,transcript,glossary,events,ports,contracts}/**`, `packages/domain/src/index.ts`.

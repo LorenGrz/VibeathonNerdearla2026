@@ -156,7 +156,7 @@ TRANSCRIBER=mock            # live | chunked | mock
 TRANSLATOR=mock             # gemini | mock
 GEMINI_API_KEY=
 GEMINI_LIVE_MODEL=gemini-3.5-transcribe-live     # verificado 2026-09-25 (el preview 2.5 fue dado de baja)
-GEMINI_TEXT_MODEL=gemini-2.5-flash                # verificar el id vigente
+GEMINI_TEXT_MODEL=gemini-3.5-flash-lite                # verificar el id vigente
 MAX_SESSIONS=12
 SAMPLES_DIR=../../samples
 ```

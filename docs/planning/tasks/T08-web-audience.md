@@ -2,7 +2,7 @@
 **Dificultad:** Media · **Agente:** `worker` (sonnet) · **Rama:** `feature/web-audience` · **Depende de:** T1 · Skill: `nextjs-ssr-frontend`
 
 ## Estilo
-Seguir `docs/design/STYLE.md` (paleta y tipografías de nerdearla.com vía tokens Tailwind en `globals.css`; no hex sueltos). Leer `apps/web/AGENTS.md`: Next 16.3 tiene APIs nuevas.
+Seguir `docs/planning/specs/STYLE.md` (paleta y tipografías de nerdearla.com vía tokens Tailwind en `globals.css`; no hex sueltos). Leer `apps/web/AGENTS.md`: Next 16.3 tiene APIs nuevas.
 
 ## Objetivo
 - `/` (server component): lista de sesiones desde `GET /api/sessions` (`cache: 'no-store'`), tarjeta por sesión con escenario, idioma original, estado (badge live) y botones por idioma disponible.
