@@ -2,7 +2,7 @@
 **Dificultad:** Media · **Agente:** `worker` (sonnet) · **Rama:** `feature/web-admin` · **Depende de:** T1 · Skill: `nextjs-ssr-frontend`
 
 ## Estilo
-Seguir `docs/design/STYLE.md` (paleta y tipografías de nerdearla.com vía tokens Tailwind en `globals.css`; no hex sueltos). Leer `apps/web/AGENTS.md`: Next 16.3 tiene APIs nuevas.
+Seguir `docs/planning/specs/STYLE.md` (paleta y tipografías de nerdearla.com vía tokens Tailwind en `globals.css`; no hex sueltos). Leer `apps/web/AGENTS.md`: Next 16.3 tiene APIs nuevas.
 
 ## Objetivo
 - `/admin`: tabla de sesiones en vivo vía `/admin` namespace (`sessions:snapshot`): título, escenario, estado, chunks, latencia p50/p95, errores + último error, última actividad (resaltar si > 10 s sin actividad estando live).
