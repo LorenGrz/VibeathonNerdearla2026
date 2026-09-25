@@ -18,7 +18,12 @@ import { TranslationModule } from './translation/translation.module.js';
  */
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, validate: validateEnv }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      validate: validateEnv,
+      // Tests must not depend on a developer's local .env (e.g. TRANSCRIBER=live + a real key).
+      ignoreEnvFile: process.env.NODE_ENV === 'test',
+    }),
     PersistenceModule,
     RealtimeModule,
     IngestModule,
