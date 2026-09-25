@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { SESSION_REPOSITORY, TRANSCRIPT_REPOSITORY } from '../shared/tokens.js';
 import { InMemorySessionRepository } from './in-memory-session.repository.js';
 import { InMemoryTranscriptRepository } from './in-memory-transcript.repository.js';
@@ -7,6 +7,7 @@ import { InMemoryTranscriptRepository } from './in-memory-transcript.repository.
  * Binds the repository ports to in-memory adapters. Nest instantiates a static module once,
  * so every importer shares the same repositories.
  */
+@Global()
 @Module({
   providers: [
     { provide: SESSION_REPOSITORY, useClass: InMemorySessionRepository },

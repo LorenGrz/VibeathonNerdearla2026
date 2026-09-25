@@ -112,7 +112,7 @@ function splitSegmentIfNeeded(
 
 export class SrtExporter implements TranscriptExporter {
   readonly format: ExportFormat = 'srt';
-  readonly mimeType = 'text/plain; charset=utf-8';
+  readonly mimeType = 'application/x-subrip; charset=utf-8';
 
   export(segments: readonly TranscriptSegment[]): string {
     if (segments.length === 0) return '';

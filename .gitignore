@@ -42,3 +42,6 @@ Thumbs.db
 
 # agent worktrees
 .claude/worktrees/
+
+# third-party demo clips (see samples/README.md)
+samples/*-nerdearla.mp3

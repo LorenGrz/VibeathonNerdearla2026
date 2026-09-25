@@ -53,21 +53,18 @@ describe('FfmpegAudioSource', () => {
     }).rejects.toThrow(/traversal|outside SAMPLES_DIR/i);
   });
 
-  it('rejects an absolute path that does not resolve within SAMPLES_DIR only when relative', async () => {
-    // Per the domain contract, `AudioSourceSpec.file.path` may be relative (to SAMPLES_DIR) or
-    // absolute; an absolute path outside SAMPLES_DIR is used as-is and only fails when the file
-    // itself does not exist.
+  it('rejects an absolute path outside SAMPLES_DIR', async () => {
     const source = new FfmpegAudioSource({ samplesDir, realtime: false });
     const controller = new AbortController();
 
     await expect(async () => {
       for await (const _chunk of source.open(
-        { kind: 'file', path: '/nonexistent/path/does-not-exist.mp3' },
+        { kind: 'file', path: '/etc/passwd' },
         controller.signal,
       )) {
         // no-op
       }
-    }).rejects.toThrow(/ffmpeg exited with code/i);
+    }).rejects.toThrow(/outside SAMPLES_DIR/i);
   });
 
   it('rejects the "mic" source kind', async () => {

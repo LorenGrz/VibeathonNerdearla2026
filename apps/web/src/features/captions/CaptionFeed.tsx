@@ -43,7 +43,7 @@ export function CaptionFeed({
   const isEmpty = finals.length === 0 && !partial;
 
   return (
-    <div className="relative flex-1 overflow-hidden">
+    <div className="relative h-[calc(100dvh-16rem)] min-h-64 overflow-hidden">
       <div
         ref={containerRef}
         role="log"

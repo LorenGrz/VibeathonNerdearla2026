@@ -214,7 +214,7 @@ describe('exporterFor', () => {
 
   it('provides correct MIME type for SRT', () => {
     const exporter = exporterFor('srt');
-    expect(exporter.mimeType).toBe('text/plain; charset=utf-8');
+    expect(exporter.mimeType).toBe('application/x-subrip; charset=utf-8');
   });
 
   it('provides correct MIME type for VTT', () => {

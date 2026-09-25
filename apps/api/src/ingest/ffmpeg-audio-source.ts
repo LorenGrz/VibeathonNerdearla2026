@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process';
-import { isAbsolute, resolve, sep } from 'node:path';
+import { resolve, sep } from 'node:path';
 import type { AudioChunk, AudioSourcePort, AudioSourceSpec } from '@subs/domain';
 import { AUDIO_FORMAT } from '@subs/domain';
 
@@ -51,11 +51,11 @@ export class FfmpegAudioSource implements AudioSourcePort {
     }
   }
 
-  /** Resolves relative paths against `samplesDir`, rejecting traversal outside of it. */
+  /**
+   * Resolves paths against `samplesDir` and rejects anything outside it (absolute paths too):
+   * the admin API is unauthenticated, so it must not be able to read arbitrary files.
+   */
   private resolveFilePath(rawPath: string): string {
-    if (isAbsolute(rawPath)) {
-      return rawPath;
-    }
     const resolved = resolve(this.samplesDir, rawPath);
     const boundary = this.samplesDir.endsWith(sep) ? this.samplesDir : `${this.samplesDir}${sep}`;
     if (resolved !== this.samplesDir && !resolved.startsWith(boundary)) {
