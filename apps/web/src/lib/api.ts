@@ -11,7 +11,12 @@ import type {
 
 const DEFAULT_API_BASE_URL = 'http://localhost:4000';
 
-export const getApiBaseUrl = (): string => process.env.NEXT_PUBLIC_API_URL ?? DEFAULT_API_BASE_URL;
+export const getApiBaseUrl = (): string => {
+  if (typeof window === 'undefined') {
+    return process.env.INTERNAL_API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? DEFAULT_API_BASE_URL;
+  }
+  return process.env.NEXT_PUBLIC_API_URL ?? DEFAULT_API_BASE_URL;
+};
 
 export const LANGUAGE_LABELS: Record<LanguageCodeValue, string> = {
   en: 'Inglés',

@@ -8,8 +8,9 @@ const SYSTEM_INSTRUCTION =
   'no explanations, and no extra commentary.';
 
 const TEMPERATURE = 0.2;
-/** Flash-lite answers in ~1 s, but demand spikes (503/504) can take several seconds. */
-const TIMEOUT_MS = 8000;
+/** Flash-lite answers in ~1 s, but demand spikes (503/504) can take several seconds.
+ * Note: Google GenAI API requires a minimum deadline of 10s if manually set. */
+const TIMEOUT_MS = 12000;
 /** Initial attempt + 2 retries. */
 const MAX_ATTEMPTS = 3;
 const RETRY_DELAY_MS = 500;

@@ -1,4 +1,5 @@
 import type { CreateSessionDto, ExportFormat, LanguageCodeValue, SessionDto } from '@subs/domain';
+import { getApiBaseUrl } from '@/lib/api';
 
 /** Base URL of the LiveSubs API (REST + Socket.IO). Not reachable while the panel is built. */
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000';
@@ -35,7 +36,7 @@ async function parseErrorMessage(response: Response): Promise<string> {
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(`${API_BASE_URL}/api${path}`, {
+  const response = await fetch(`${getApiBaseUrl()}/api${path}`, {
     ...init,
     headers: { 'Content-Type': 'application/json', ...init?.headers },
   });

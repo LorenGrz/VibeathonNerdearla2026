@@ -35,6 +35,7 @@ services:
     ports:
       - '3000:3000'
     environment:
+      INTERNAL_API_URL: 'http://api:4000'
       NEXT_PUBLIC_API_URL: 'http://localhost:4000'
       PORT: '3000'
     depends_on:

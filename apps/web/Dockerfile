@@ -44,6 +44,7 @@ COPY --from=builder /app/apps/web/public ./apps/web/public
 
 ENV NODE_ENV=production
 ENV PORT=3000
+ENV INTERNAL_API_URL=http://api:4000
 ENV NEXT_PUBLIC_API_URL=http://localhost:4000
 
 EXPOSE 3000
