@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { LogoIcon } from './LogoIcon';
 
 export function Header() {
   return (
@@ -6,13 +7,16 @@ export function Header() {
       <div className="h-1 w-full bg-gradient-to-r from-brand via-accent to-teal" aria-hidden="true" />
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
         <div className="flex items-center gap-6">
-          <Link href="/" className="group flex items-baseline gap-2 transition-opacity hover:opacity-90">
-            <span className="font-display text-2xl font-bold uppercase tracking-tight text-text">
-              Live<span className="text-brand">Subs</span>
-            </span>
-            <span className="hidden rounded bg-line px-1.5 py-0.5 font-display text-[10px] font-semibold uppercase tracking-wider text-accent sm:inline">
-              Nerdearla 2026
-            </span>
+          <Link href="/" className="group flex items-center gap-2.5 transition-opacity hover:opacity-90">
+            <LogoIcon size={32} className="shrink-0" />
+            <div className="flex items-baseline gap-2">
+              <span className="font-display text-2xl font-bold uppercase tracking-tight text-text">
+                Live<span className="text-brand">Subs</span>
+              </span>
+              <span className="hidden rounded bg-line px-1.5 py-0.5 font-display text-[10px] font-semibold uppercase tracking-wider text-accent sm:inline">
+                Nerdearla 2026
+              </span>
+            </div>
           </Link>
           <nav className="flex items-center gap-1 sm:gap-2">
             <Link
